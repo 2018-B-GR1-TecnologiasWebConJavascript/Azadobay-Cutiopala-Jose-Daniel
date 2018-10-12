@@ -1,0 +1,11 @@
+//para valores simpre con comillas dobles
+{
+  "nombre":"Adrian",
+  "edad": 29.12,
+  "casado": null,
+  "tieneHijos": false,
+  "mascotas":
+  {
+    "nombre":"Cripto"
+  }
+}
