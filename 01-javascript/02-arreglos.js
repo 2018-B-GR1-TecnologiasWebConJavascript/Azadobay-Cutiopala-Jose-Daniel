@@ -23,6 +23,7 @@ console.log(arregloNumeros);
 arregloNumeros.splice(0,2);
 console.log(arregloNumeros);
 
+
 //Funcion Splice
 arregloNumeros.splice(1,0,4,5,6,7,8,9,10)
 //Primer parametro: indice desde donde
