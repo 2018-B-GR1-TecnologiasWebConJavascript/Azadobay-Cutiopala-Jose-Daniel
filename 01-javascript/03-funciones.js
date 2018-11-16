@@ -75,6 +75,8 @@ console.log(sumarNNumeros(10, 1, 2, 3));
 function saludar(nombre) {
     return `Hola ${nombre.toUpperCase()}`;  //templateString sirve para mandar cualquier variable que llgue
 }
+
+
 /*
 function saludarConFuncion(nombre, funcion){
     return `Hola ${funcion(nombre)}`;
@@ -114,19 +116,21 @@ console.log(restart); //Definicion de la funcion
 
 var ejemplo= function (){} //se puede guardar una funcion anonima en una variable
 
+
+//F. en un objeto.
 var adrian = {
     trabajo: function () {
 
     }
 } ;// Tambien hay como agregarles a las propiedades de un objeto JS
 
+
+//F. anonimas en un arreglo
 var arreglo = [
     function () {
         //implementacion
     }
 ];
-
-
 
 // enviar funcion anonima scomo una definicion de una funcion.
 saludar("Maria" , function (nombre) {
@@ -138,6 +142,7 @@ saludar("Maria" , function (nombre) {
 
 let variableDos =2; //esta si la vamos a usar
 variableDos = 3;
+
 //La diferencia son los closuers
 const  edad = 29;
 //const edad = 28;
@@ -145,7 +150,6 @@ const nombre = 'Adrian';
 //nombre = 'Vicente'
 const casado = 'true';
 //casado = false
-
 const hijos = null
 // hijos = 1
 const ganarDinero = function () {
@@ -189,3 +193,6 @@ const elevarAlCuadrado2 = (numero) => numero * numero;
 const elevarAlCuadrado3 = numero => numero * numero;
 
 const restarDosnumeros = (numUno,numDos) => numUno-numDos;
+
+
+console.log("Resultado ",restarDosnumeros(10,5));

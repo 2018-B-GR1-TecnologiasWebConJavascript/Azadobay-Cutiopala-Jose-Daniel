@@ -1,5 +1,6 @@
 //Operadores
 //Utilizar constante siempre
+/*
 const arreglo= ['A','b','C'];
 
 const respuesta = arreglo
@@ -12,8 +13,11 @@ const respuesta = arreglo
             }
         );
 
-console.log(respuesta);
-arreglo.forEach(v => console.log(v)); //
+console.log(respuesta);// Devuelve undefined porque no tiene nada
+
+arreglo.forEach((v,i,a) => {
+    console.log(v)
+    console.log(a)}); //
 
 
 
@@ -40,11 +44,14 @@ const respuestaMap2 = arreglo
         valorActual => valorActual.toUpperCase()); //map crea otra variable u arreglo.
 
 console.log(arreglo);
+console.log(respuestaMap);
 console.log(respuestaMap2);
 
+*/
 
 const arregloNumeros = [8,4,10,2,5,7,9,3,6,1];
 
+/*
 
 //filter para filtrar el arreglo.
 const respuestaFilter = arregloNumeros
@@ -61,25 +68,30 @@ const menoresADos = arregloNumeros
 //console.log(respuestaFilter);
 //console.log(menoresADos);
 
+*/
 
 //Para buscar un indice.......
 //*****************************FindIndex
 const respuestaFindIndex = arregloNumeros
     .findIndex(v => v === 7);
 
-console.log(arregloNumeros.indexOf(7));
+console.log(arregloNumeros.indexOf(7)); //escoje al primero que encuentra
 console.log(respuestaFindIndex);
 
 //Diferencia de index of y findIndex
 // Es que con findIndex se puede buscar por ID en un objeto
+// Con indexOf solo se buscar por el indice, no nos sirve en un objeto.
+
+
 
 const respuestaFind = arregloNumeros
-    .find(v => v === 8);
+    .find((v,i )=> v === 8);
 console.log(respuestaFind);
 
 // Tablas de verdad con Operadores
 //Operador some
 // Si algunos es verdadero todo es verdadero
+
 const respuestaSome = arregloNumeros
     .some (n => n % 11 === 0);
 
@@ -105,14 +117,19 @@ console.log(rReduce)
 const resReduce = arregloNumeros
 .reduce((acumulado,valorActual) => acumulado-valorActual, 100);
 
+console.log(arregloNumeros)
+
 const mayorA7 = arregloNumeros
     .reduce((a,b) => {
-        if(a > 7){
-            return a + b;
-        }else {
-            return b;
-        }
-    }
+             if(b > 7){
+                return a + b;
+            }else {
+                return a;
+            }
+    },0
     );
+console.log(mayorA7)
+
+
 
 console.log(resReduce);

@@ -1,5 +1,4 @@
 /*
-
 const fs = require('fs');
 const nombre = '06-ejemplo.txt';
 const nuevaPromesa = (nombreArchivo) => {
@@ -62,66 +61,63 @@ nuevaPromesa(nombre)
 
 */
 
-// ['A','B','C']
-// 0-A.txt 'A'
-// 1-B.txt 'B'
-// 2-C.txt 'C'
 
-
+// Ejercicio en clase OpenFile transformar a promesa.
 
 const fs = require('fs');
+let contenidoFinal = 'Inicial'
 
-const respuesta = {
-    nombreArchivo: '',
-    contenidoArchivo: '',
-    error: '',
-}
 
-function ejercicio(arregloStrings, callback){
-    const respuestas = [];
-    arregloStrings
-        .forEach(
-            (string,indice)=> {
-                const nombreArchivo = `${indice}-${string}.txt`;
-                const contenido = string;
-                fs.writeFile(
-                    nombreArchivo,
-                    contenido,
-                    (err)=> {
+
+const oppendFile = (nombreArchivo, contenido)=>{
+    return new Promise((resolve,reject)=>{
+        fs.readFile(
+            nombreArchivo,
+            'utf-8',
+            (error, contenidoLeidoDelArchivo) => {
+                if(error){
+                    //escribimos el archivo
+                    fs.writeFile(nombreArchivo,contenido,(err)=>{
                         if(err){
-
-                        }else{
-                            const respuesta = {
-                                nombreArchivo: nombreArchivo,
-                                contenidoArchivo: contenido,
-                                error: err,
-                            };
-                            respuestas.push(respuesta);
-                            const condicion = respuestas.length === arregloStrings.length;
-
-                            if(estaCompletoElArreglo){
-                                callback(respuestas);
-                            }
+                            //console.log('Error escribiendo');
+                            reject(err)
+                        }else {
+                            //Devolver contenido
+                            //return contenidoFinal;
+                            resolve(contenido);
                         }
-                    }
-                );
+                    });
+                }else{
+                    //anadimos el contenido del archivo leido
+                    // al contenido a escribir en el archivo
+                    fs.writeFile(nombreArchivo,contenidoLeidoDelArchivo + contenido,(err)=>{
+                        if(err){
+                            //console.log('Error escribiendo');
+                            reject(err)
+                        }else {
+                            //Devolver contenido
+                            //return contenidoLeidoDelArchivo + contenidoFinal;
+                            resolve(contenidoLeidoDelArchivo + contenido );
+                        }
+                    });
+                }
             }
         )
+    })
 }
 
 
+oppendFile('06-ejemplo.txt','\nHola amigos')
+    .then((contenido)=>{ //then recibe una funcion como parametro
+        console.log(contenido);
+    })
+    .catch((error)=>{
+        //console.log('Catch: ',error);
+    })
 
-ejercicio(['A','B','C'],
-    (respuestaEjercicio)=>{
-        console.log(respuestaEjercicio);
-    });
 
-//appenFile con promesas.
-
-
-
-const appendFile = (nombreArchivo, contenido, callback) => {
-    return new Promise(
+/*
+function oppendFile(nombreArchivo, contenido, callback){
     // 1) Leer archivo
     // 2.1) Si existe, le anado el contenido al contenido del archivo
     // 2.2) Si no existe, le creo al archivo con el contenido
@@ -159,19 +155,21 @@ const appendFile = (nombreArchivo, contenido, callback) => {
             }
         }
     )
-    )
-};
+}
 
 
-appendFile('06-ejemplo.txt','\nHola amigos',(contenido,err))
-    .then(
-        (contenido) => {
+//const respuestaAppenFile = appendFile('06-ejemplo.txt','Hola amigos');
+//console.log(respuestaAppenFile);
+//appendFile('06-ejemplo.txt','Hola amigos');
+//console.log(contenidoFinal);
+oppendFile('06-ejemplo2.txt','\nHola amigos',
+    ( contenido,err ) => {
+        //console.log(contenido);
+        if(err){
+            console.log(err);
+        }else {
             console.log(contenido);
-            return nuevaPromesaEscritura('07-ejemplo2.txt', contenido + 'Adios amigos');
         }
-    )
-    .catch(
-        (error) => {
-            console.log('Catch',error);
-        }
-    );
+    })
+
+    */
