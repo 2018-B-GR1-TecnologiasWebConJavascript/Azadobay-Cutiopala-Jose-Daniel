@@ -49,7 +49,7 @@ console.log(respuestaMap2);
 
 */
 
-const arregloNumeros = [8,4,10,2,5,7,9,3,6,1];
+const arregloNumeros = [8,4,10,2,5,7,9,8,6,1];
 
 /*
 
@@ -84,14 +84,17 @@ console.log(respuestaFindIndex);
 
 
 
-const respuestaFind = arregloNumeros
-    .find((v,i )=> v === 8);
+const respuestaFind = arregloNumeros.find((valor,indice )=> {
+    valor === 8
+    indice === indice
+} );
+
 console.log(respuestaFind);
 
 // Tablas de verdad con Operadores
 //Operador some
 // Si algunos es verdadero todo es verdadero
-
+/*
 const respuestaSome = arregloNumeros
     .some (n => n % 11 === 0);
 
@@ -133,3 +136,4 @@ console.log(mayorA7)
 
 
 console.log(resReduce);
+*/

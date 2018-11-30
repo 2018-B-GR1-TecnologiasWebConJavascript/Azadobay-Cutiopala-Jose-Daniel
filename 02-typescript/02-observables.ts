@@ -24,7 +24,7 @@ const numeros$ = rxjs.of(
 
 console.log(numeros$);
 
-/*
+
 numeros$
     .pipe(
         distinct()
@@ -43,7 +43,7 @@ numeros$
         },
 
     );
-*/
+
 
 const promesita = (correcto) => {
     return new Promise(
@@ -66,7 +66,7 @@ const promesita$ = rxjs.from(promesita(true));
 const promesitaNoOk$ = rxjs.from(promesita(true));
 
 
-
+/*
 
 numeros$
     .pipe(
@@ -98,7 +98,7 @@ numeros$
 
 
 
-
+*/
 
 
 
