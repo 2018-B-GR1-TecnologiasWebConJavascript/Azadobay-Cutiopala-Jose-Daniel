@@ -1,4 +1,12 @@
 //declare var require;
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 const inquirer = require('inquirer');
 const fs = require('fs');
 const rxjs = require('rxjs');
@@ -12,7 +20,7 @@ const preguntaMenu = {
         'Crear',
         'Borrar',
         'Buscar',
-        'Actualizar',
+        'Editar',
     ]
 };
 const preguntaComic = [
@@ -32,23 +40,57 @@ const preguntaComic = [
         message: 'tipo del comic'
     },
 ];
-const buscarComicPorNombre = [
+const preguntarComicPorNombre = [
     {
         type: 'input',
         name: 'nombre',
         message: 'Escribe el nombre del comic a buscar'
     }
 ];
+const preguntarComicPorID = [
+    {
+        type: 'input',
+        name: 'idComic',
+        message: 'Escribe el codigo del comic'
+    }
+];
+const preguntaCampoAEditar = [
+    {
+        type: 'list',
+        name: 'campo',
+        message: 'Que campo desea editar ? ',
+        choices: [
+            'id',
+            'nombre',
+            'tipo',
+        ]
+    }
+];
+const preguntarNuevoDato = [
+    {
+        type: 'input',
+        name: 'nuevo',
+        message: 'Ingresa el nuevo dato'
+    }
+];
+// @ts-ignore
 function main() {
-    iniciarBase()
-        .pipe(preguntarOpcionesMenu(), preguntarDatos(), ejecutarAccion(), actualizarBDD())
-        .subscribe((respuesta) => {
-        console.log(respuesta);
-    }, (error) => {
-        console.log(error);
-    }, () => {
-        console.log('complete');
-        main();
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            iniciarBase()
+                .pipe(preguntarOpcionesMenu(), ejecutarOpcion())
+                .subscribe((respuesta) => {
+                console.log(JSON.stringify(respuesta));
+            }, (error) => {
+                console.log(error);
+            }, () => {
+                console.log('complete');
+                main();
+            });
+        }
+        catch (e) {
+            console.log('Hubo un error');
+        }
     });
 }
 function iniciarBase() {
@@ -114,7 +156,7 @@ function preguntarOpcionesMenu() {
         }));
     });
 }
-function preguntarDatos() {
+function ejecutarOpcion() {
     return mergeMap((respuesta) => {
         switch (respuesta.opcionMenu.opcionMenu) {
             case 'Crear':
@@ -123,20 +165,121 @@ function preguntarDatos() {
                     .pipe(map((comic) => {
                     respuesta.comic = comic;
                     return respuesta;
-                }));
-            case 'Actualizar':
+                }), insertarComic(), actualizarBDD());
+            case 'Buscar':
                 return rxjs
-                    .from(inquirer.prompt(buscarComicPorNombre))
-                    .pipe(map((comic) => {
-                    respuesta.comic = comic;
+                    .from(inquirer.prompt(preguntarComicPorNombre))
+                    .pipe(mergeMap((comic) => {
+                    return rxjs.from(buscarComicPorNombre(comic.nombre));
+                }));
+            case 'Editar':
+                return rxjs
+                    .from(inquirer.prompt(preguntaCampoAEditar))
+                    .pipe(mergeMap((opc) => {
+                    switch (opc.campo) {
+                        case 'id':
+                        case 'nombre':
+                            return rxjs.from(inquirer.prompt(preguntarComicPorID))
+                                .pipe(map(ID => {
+                                return ID.idComic;
+                            }), mergeMap((ID) => {
+                                //console.log(respuesta);
+                                return rxjs.from(inquirer.prompt(preguntarNuevoDato))
+                                    .pipe(mergeMap((nuevoDato) => {
+                                    return rxjs.from(editarComic(ID, nuevoDato.nuevo));
+                                }));
+                            }));
+                        /*
+                        return rxjs.from(inquirer.prompt(preguntarNuevoDato))
+                            .pipe(
+                                map(nuevoDato => {
+                                    const comicAux = nuevoDato.nuevo;
+                                    return comicAux;
+                                }),
+                                mergeMap((respuesta) => {
+
+                                    console.log(respuesta);
+                                    return rxjs.from(editarComic('12', respuesta)
+                                    )
+                                })
+                            );*/
+                        case 'tipo':
+                        case 'salir':
+                    }
+                    console.log(opc.campo);
+                }));
+            case 'Borrar':
+                return rxjs.from(inquirer.prompt(preguntarComicPorID))
+                    .pipe(mergeMap(ID => {
+                    return rxjs.from(eliminar(ID.idComic));
                 }));
         }
     });
 }
-function ejecutarAccion() {
+/*
+return rxjs.from(inquirer.prompt(preguntarNuevoDato))
+    .pipe(
+        map(nuevoDato => {
+            const comicAux = nuevoDato.nuevo;
+            return comicAux;
+        }),
+        mergeMap((respuesta) => {
+
+            console.log(respuesta);
+            return rxjs.from(editarComic('12', respuesta)
+            )
+        })
+    );*/
+function insertarComic() {
     return map((respuesta) => {
         respuesta.bdd.comics.push(respuesta.comic);
         return respuesta;
+    });
+}
+function eliminar(id) {
+    return new Promise((resolve, reject) => {
+        fs.readFile('bdd.json', 'utf-8', (err, contenido) => {
+            if (err) {
+                reject({ mensaje: 'Error leyendo' });
+            }
+            else {
+                const bdd = JSON.parse(contenido);
+                const indiceComic = bdd.comics
+                    .findIndex(comic => comic.id = id);
+                bdd.comics.splice(indiceComic, 1);
+                fs.writeFile('bdd.json', JSON.stringify(bdd), (err) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    else {
+                        resolve({ mensaje: 'Archivo Eliminado' });
+                    }
+                });
+            }
+        });
+    });
+}
+function editarComic(nombre, nuevoNombre) {
+    return new Promise((resolve, reject) => {
+        fs.readFile('bdd.json', 'utf-8', (err, contenido) => {
+            if (err) {
+                reject({ mensaje: 'Error leyendo' });
+            }
+            else {
+                const bdd = JSON.parse(contenido);
+                const indiceComic = bdd.comics
+                    .findIndex(comic => comic.id = nombre);
+                bdd.comics[indiceComic].nombre = nuevoNombre;
+                fs.writeFile('bdd.json', JSON.stringify(bdd), (err) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    else {
+                        resolve({ mensaje: 'Archivo Editado' });
+                    }
+                });
+            }
+        });
     });
 }
 function actualizarBDD() {
@@ -162,7 +305,7 @@ function guardarBDD(bdd) {
         });
     });
 }
-function editarUsuario(nombre, nuevoNombre) {
+function editarUsuario(campo, nuevoCampo) {
     return new Promise((resolve, reject) => {
         fs.readFile('bdd.json', 'utf-8', (err, contenido) => {
             if (err) {
@@ -170,11 +313,16 @@ function editarUsuario(nombre, nuevoNombre) {
             }
             else {
                 const bdd = JSON.parse(contenido);
-                const indiceUsuario = bdd.usuarios
-                    .findIndex((usuario) => {
-                    return usuario.nombre = nombre;
-                });
-                bdd.usuarios[indiceUsuario].nombre = nuevoNombre;
+                /*
+                 const indiceComic = bdd.comics
+                     .findIndex(
+                         (comic) => {
+                             return comic.nombre = campo;
+                         }
+                     );
+
+                 bdd.comics[indiceComic].campo = nuevoCampo;
+*/
                 fs.writeFile('bdd.json', JSON.stringify(bdd), (err) => {
                     if (err) {
                         reject(err);
@@ -187,7 +335,7 @@ function editarUsuario(nombre, nuevoNombre) {
         });
     });
 }
-function buscarUsuarioPorNombre(nombre) {
+function buscarIndiceComicPorID(id) {
     return new Promise((resolve, reject) => {
         fs.readFile('bdd.json', 'utf-8', (err, contenido) => {
             if (err) {
@@ -195,10 +343,39 @@ function buscarUsuarioPorNombre(nombre) {
             }
             else {
                 const bdd = JSON.parse(contenido);
-                const respuestaFind = bdd.usuarios.find((usuario) => {
-                    return usuario.nombre === nombre;
-                });
-                resolve(respuestaFind);
+                const respuestaFind = bdd.comics.findIndex(comic => comic.id === '2');
+                if (respuestaFind >= 0) {
+                    resolve(respuestaFind);
+                    console.log(respuestaFind);
+                }
+                else {
+                    resolve(respuestaFind);
+                }
+            }
+        });
+    });
+}
+function buscarComicPorNombre(nombre) {
+    return new Promise((resolve, reject) => {
+        fs.readFile('bdd.json', 'utf-8', (err, contenido) => {
+            if (err) {
+                reject({ mensaje: 'Error leyendo' });
+            }
+            else {
+                const bdd = JSON.parse(contenido);
+                const respuestaFind = bdd.comics.filter(comic => comic.nombre === nombre);
+                if (respuestaFind != "") {
+                    resolve({
+                        mensaje: 'Comic Encontrado',
+                        Comic: respuestaFind
+                    });
+                }
+                else {
+                    resolve({
+                        mensaje: 'Comic NO Encontrado',
+                        Comic: respuestaFind
+                    });
+                }
             }
         });
     });

@@ -125,7 +125,6 @@ function main() {
 }
 
 function inicializarBase() {
-
     const bddLeida$ = rxjs.from(leerBDD());
 
     return bddLeida$

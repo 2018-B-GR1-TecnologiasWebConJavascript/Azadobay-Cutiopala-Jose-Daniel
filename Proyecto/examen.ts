@@ -87,6 +87,7 @@ function leerBase() {
 export interface BaseDeDatos{
     mensaje: string;
     bdd?: BaseDeDatos;
+    types:types[];
 
 }
 
