@@ -10,6 +10,9 @@
   "license": "ISC",
   "dependencies": {
     "@types/node": "^10.12.7",
-    "inquirer": "^6.2.0"
+    "express": "^4.16.4",
+    "fs": "0.0.1-security",
+    "inquirer": "^6.2.0",
+    "rxjs": "^6.3.3"
   }
 }
